@@ -31,7 +31,10 @@
             :class="item.gunStatus==1?'idle':'idleErr'"
           >{{gunStatus(item.gunStatus)}}</span>
         </div>
-        <div @click="checkGun(item.gunId,item.gunCode,item.chargingMode)" class="outer">
+        <div
+          @click="checkGun(item.gunId,item.gunCode,item.chargingMode,item.gunStatus)"
+          class="outer"
+        >
           <span v-bind:class="item.gunId == gunId ? 'innerCheck' : 'inner'"></span>
         </div>
         <!-- </div>
@@ -84,13 +87,12 @@
       <span style="dispaly:inline">{{unit}}</span>
     </div>
     <!-- 开始按钮 -->
-    <div @click="start" class="button">开始充电</div>
+    <div @click="testPile" class="button">开始充电</div>
   </div>
 </template>
 
 <script>
 import util from "../../libs/util.js";
-// import "../../libs/flexible.js";
 
 export default {
   data() {
@@ -156,10 +158,12 @@ export default {
           return null;
       }
     },
-    checkGun(gunId, gunCode, chargingMode) {
-      this.gunId = gunId;
-      this.gunCode = gunCode;
-      this.chargingMode = chargingMode;
+    checkGun(gunId, gunCode, chargingMode, gunStatus) {
+      if (gunStatus == 1 || gunStatus == 2) {
+        this.gunId = gunId;
+        this.gunCode = gunCode;
+        this.chargingMode = chargingMode;
+      }
     },
     init(value) {
       document.title = this.title;
@@ -185,6 +189,7 @@ export default {
     },
     start() {
       let _this = this;
+
       let appUserId = util.locals.get("appUserId");
       util.locals.set("chargingPileId", _this.chargingPileId);
       if (!_this.isInteger(_this.feeValue)) {
@@ -235,6 +240,7 @@ export default {
         })
         .catch(err => {
           _this.$loading.hide();
+
           util.handleError(err);
         });
     },
@@ -255,6 +261,79 @@ export default {
         default:
           "故障";
       }
+    },
+    testPile() {
+      let _this = this;
+      let params = {
+        chargingPileId: _this.chargingPileId
+      };
+      util
+        .request(global.API_PREFIX + "/api/v1/charging/check", params)
+        .then(res => {
+          console.log("gunRes:", res);
+          // debugger;
+          if (res.data.code == 0) {
+            _this.start();
+          } else {
+            if (res.data.msg) {
+              // _this.$alert(res.data.msg);
+              let options = {
+                title: "提示",
+                content: res.data.msg,
+                yesText: "排队充电",
+                noText: "取消"
+              };
+              _this.$confirm(options).then(() => {
+                _this.handUp();
+              });
+            }
+          }
+        })
+        .catch(err => {
+          _this.$alert(err.message);
+          util.handleError(err);
+        });
+    },
+    handUp() {
+      let _this = this;
+      //       {
+      //     "chargingPileId": 1000055,
+      //     "chargingPileName": "桩5（交直流可用）",
+      //     "virtualId": "0310e1",
+      //     "appUserId": 16544,
+      //     "gunCode": "1",
+      //     "chargingMode": "1",
+      //     "controlInfo": "1",
+      //     "controlData": "320"
+      // }
+      let appUserId = util.locals.get("appUserId");
+      let params = {
+        chargingMode: this.chargingMode, //充电类型
+        chargingPileId: this.chargingPileId,
+        chargingPileName: this.chargingPileName,
+        virtualId: this.virtualId,
+        appUserId: appUserId,
+        gunCode: this.gunCode,
+        controlInfo: this.controlInfo,
+        controlData: this.controlInfo != 4 ? this.feeValue : 0
+      };
+      util
+        .request(global.API_PREFIX + "/api/v1/charging/handUp", params)
+        .then(res => {
+          console.log("gunRes:", res);
+          // debugger;
+          if (res.data.code == 0) {
+            _this.$alert("挂起成功");
+          } else {
+            if (res.data.msg) {
+              _this.$alert(res.data.msg);
+            }
+          }
+        })
+        .catch(err => {
+          _this.$alert(err.message);
+          util.handleError(err);
+        });
     }
   }
 };
@@ -535,6 +614,8 @@ html {
   border: 1px solid transparent;
   border-bottom-color: #808080;
   margin: 0.42rem 0 0.42rem 2rem;
+  -webkit-user-select: text !important;
+  -webkit-appearance: none;
 }
 .button {
   width: 6.67rem;

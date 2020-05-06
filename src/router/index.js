@@ -15,6 +15,8 @@ import Personal from '@/wecode/Personal/index'
 import PersonalDetail from '@/wecode/PersonalDetail/index'
 import searchList from '@/wecode/searchList/index'
 import weHome from '@/wecode/home/index'
+// import subscribe from '@/wecode/subscribe/index'
+
 Vue.use(Router)
 export default new Router({
   routes: [
@@ -99,10 +101,17 @@ export default new Router({
       name: 'searchList',
       component: searchList
     },
+    
     {
       path: '/weHome',
       name: 'weHome',
       component: weHome
     }
+    // ,
+    // {
+    //   path: '/subscribe',
+    //   name: 'subscribe',
+    //   component: subscribe
+    // }
   ]
 })

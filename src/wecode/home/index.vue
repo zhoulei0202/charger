@@ -99,6 +99,7 @@
       <!-- 公告  -->
       <!-- <p class="tip">即日起充电桩费用上涨，具体费用参考各桩点</p> -->
       <p v-show="tips==0" class="tip">苹果手机暂不支持扫码</p>
+      <!-- <p v-show="tips==0" class="tip">暂无公告</p> -->
     </div>
 
     <!-- 遮罩层 -->
@@ -216,14 +217,11 @@ export default {
         _this.map.addControl(geolocation);
         geolocation.getCurrentPosition(function(status, result) {
           if (status == "complete") {
-            // debugger;
             console.log("定位结果：" + result.position);
             _this.center.lng = result.position.getLng();
             _this.center.lat = result.position.getLat();
           } else {
             _this.$message.error("定位失败");
-            // debugger;
-
             _this.center.lng = _this.map.getCenter().lng;
             _this.center.lat = _this.map.getCenter().lat;
           }
@@ -406,32 +404,31 @@ export default {
         query: this.centers
       });
     },
-    checkGun(chargingPileId) {
-      let _this = this;
-      let params = {
-        chargingPileId: chargingPileId
-      };
-      util
-        .request(global.API_PREFIX + "/api/v1/charging/check", params)
-        .then(res => {
-          console.log("gunRes:", res);
-          // debugger;
-
-          if (res.data.code == 0) {
-            _this.$router.push({
-              path: "/ChargeInfo"
-            });
-          } else {
-            if (res.data.msg) {
-              _this.$alert(res.data.msg);
-            }
-          }
-        })
-        .catch(err => {
-          _this.$alert(err.message);
-          util.handleError(err);
-        });
-    },
+    // checkGun(chargingPileId) {
+    //   let _this = this;
+    //   let params = {
+    //     chargingPileId: chargingPileId
+    //   };
+    //   util
+    //     .request(global.API_PREFIX + "/api/v1/charging/check", params)
+    //     .then(res => {
+    //       console.log("gunRes:", res);
+    //       // debugger;
+    //       if (res.data.code == 0) {
+    //         _this.$router.push({
+    //           path: "/ChargeInfo"
+    //         });
+    //       } else {
+    //         if (res.data.msg) {
+    //           _this.$alert(res.data.msg);
+    //         }
+    //       }
+    //     })
+    //     .catch(err => {
+    //       _this.$alert(err.message);
+    //       util.handleError(err);
+    //     });
+    // },
 
     // 扫码功能
     useCammera() {

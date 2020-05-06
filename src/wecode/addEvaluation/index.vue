@@ -108,7 +108,11 @@ export default {
             });
           } else {
             _this.$loading.hide();
-
+            let str = "";
+            res.data.code == 999
+              ? (str = "服务器内部失败")
+              : (str = "评论失败");
+            _this.$alert(str);
             _this.$alert("评论失败");
           }
           // 发布成功进入首页

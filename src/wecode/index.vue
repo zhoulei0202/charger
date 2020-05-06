@@ -30,7 +30,7 @@ export default {
           .request(global.API_PREFIX + "/api/v1/user/weCodeLogin", params)
           .then(res => {
             // debugger;
-            console.log("res:", res);
+            // console.log("res:", res);
             _this.$loading.hide();
             if (res.data.code == 0) {
               util.locals.clearLocalStorage();
@@ -44,7 +44,11 @@ export default {
               util.locals.set("appUserId", res.data.data.appUserId);
               _this.$router.push("weHome");
             } else {
-              alert(res.data.code);
+              let str = "";
+              res.data.code == 999
+                ? (str = "服务器内部失败")
+                : (str = "登录失败请重试");
+              _this.$alert(str);
             }
             return false;
           })

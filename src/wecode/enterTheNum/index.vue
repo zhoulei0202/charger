@@ -73,7 +73,10 @@ export default {
             // debugger;
             util.locals.set("qrcode", _this.inputValue);
             util.locals.setObject("scanData", res.data.data);
-            _this.checkGun(res.data.data.chargingPileId);
+            // _this.checkGun(res.data.data.chargingPileId);
+            _this.$router.push({
+              path: "/ChargeInfo"
+            });
           } else {
             if (res.data.msg) {
               _this.$alert(res.data.msg);
@@ -118,6 +121,8 @@ export default {
   user-select: none;
   resize: none;
   box-sizing: border-box;
+  -webkit-user-select: text !important;
+  -webkit-appearance: none;
 }
 .main {
   width: 100%;

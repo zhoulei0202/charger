@@ -10,6 +10,8 @@
     <!--扫描结果-->
 
     <qrcode-stream @decode="onDecode" @init="onInit" />
+    <!-- <qrcode-dropZone /> -->
+    <!-- <qrcode-capture /> -->
   </div>
 </template>
 
@@ -19,11 +21,11 @@
 import util from "../../libs/util";
 
 //引入
-import { QrcodeStream } from "vue-qrcode-reader";
+import { QrcodeStream, QrcodeDropZone, QrcodeCapture } from "vue-qrcode-reader";
 
 export default {
   //注册
-  components: { QrcodeStream },
+  components: { QrcodeStream, QrcodeDropZone, QrcodeCapture },
 
   data() {
     return {
@@ -31,14 +33,17 @@ export default {
       error: "" //错误信息
     };
   },
-
+  // created() {
+  //   var userAgent = navigator.userAgent; // 取得浏览器的userAgent字符串
+  //   alert(userAgent);
+  // },
   methods: {
     onDecode(result) {
       // alert(result);
       let _this = this;
       // this.result = result;
       if (_this.error) {
-        _this.$alert(res.data.msg).then(() => {
+        _this.$alert(_this.error).then(() => {
           _this.$router.push({
             path: "/weHome"
           });
@@ -53,12 +58,14 @@ export default {
         .then(res => {
           console.log("gunRes:", res);
           // debugger;
-          // _this.$alert("saoma");
           if (res.data.code == 0 && res.data.data) {
             // debugger;
             util.locals.set("qrcode", _this.inputValue);
             util.locals.setObject("scanData", res.data.data);
-            _this.checkGun(res.data.data.chargingPileId);
+            // _this.checkGun(res.data.data.chargingPileId);
+            _this.$router.push({
+              path: "/ChargeInfo"
+            });
           } else {
             if (res.data.msg) {
               _this.$alert(res.data.msg);
@@ -68,6 +75,7 @@ export default {
     },
 
     async onInit(promise) {
+      // debugger;
       try {
         await promise;
       } catch (error) {
@@ -86,32 +94,32 @@ export default {
         }
       }
     },
-    checkGun(chargingPileId) {
-      let _this = this;
-      let params = {
-        chargingPileId: chargingPileId
-      };
-      util
-        .request(global.API_PREFIX + "/api/v1/charging/check", params)
-        .then(res => {
-          console.log("gunRes:", res);
-          // debugger;
+    // checkGun(chargingPileId) {
+    //   let _this = this;
+    //   let params = {
+    //     chargingPileId: chargingPileId
+    //   };
+    //   util
+    //     .request(global.API_PREFIX + "/api/v1/charging/check", params)
+    //     .then(res => {
+    //       console.log("gunRes:", res);
+    //       // debugger;
 
-          if (res.data.code == 0) {
-            _this.$router.push({
-              path: "/ChargeInfo"
-            });
-          } else {
-            if (res.data.msg) {
-              _this.$alert(res.data.msg);
-            }
-          }
-        })
-        .catch(err => {
-          _this.$alert(err.message);
-          util.handleError(err);
-        });
-    }
+    //       if (res.data.code == 0) {
+    //         _this.$router.push({
+    //           path: "/ChargeInfo"
+    //         });
+    //       } else {
+    //         if (res.data.msg) {
+    //           _this.$alert(res.data.msg);
+    //         }
+    //       }
+    //     })
+    //     .catch(err => {
+    //       _this.$alert(err.message);
+    //       util.handleError(err);
+    //     });
+    // }
   }
 };
 </script>

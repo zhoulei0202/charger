@@ -4,7 +4,6 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import Config from './libs/config'
-
 import VueAMap from 'vue-amap';
 const amapKey = "3e76c35ec5bfcf88a96d81d468c87bb3";
 Vue.use(VueAMap);
